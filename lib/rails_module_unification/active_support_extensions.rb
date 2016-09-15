@@ -1,5 +1,19 @@
 module RailsModuleUnification
   module ActiveSupportExtensions
+    def load_from_path(file_path, qualified_name, from_mod, const_name)
+      expanded = File.expand_path(file_path)
+      expanded.sub!(/\.rb\z/, ''.freeze)
+
+      if loading.include?(expanded)
+        raise "Circular dependency detected while autoloading constant #{qualified_name}"
+      else
+        binding.pry
+        require_or_load(expanded, qualified_name)
+        raise LoadError, "Unable to autoload constant #{qualified_name}, expected #{file_path} to define it" unless from_mod.const_defined?(const_name, false)
+        return from_mod.const_get(const_name)
+      end
+    end
+
     # Load the constant named +const_name+ which is missing from +from_mod+. If
     # it is not possible to load the constant into from_mod, try its parent
     # module using +const_missing+.
@@ -7,29 +21,27 @@ module RailsModuleUnification
       # always default to the actual implementation
       super
     rescue LoadError
+      suffixes = /(Controller|Serializer)\z/
+      const_name_parts = const_name.to_s.split(suffixes)
 
-      # TODO: Remove all this, because super does it.
-      unless qualified_const_defined?(from_mod.name) && ActiveSupport::Inflector.constantize(from_mod.name).equal?(from_mod)
-        raise ArgumentError, "A copy of #{from_mod} has been removed from the module tree but is still active!"
-      end
+      # folder/type.rb
+      folder_type_name = const_name_parts.join('/').downcase
+
+      # TODO write code to import this kind of naming scheme
+      
+      # from_mod.const_get(folder_type_name)
 
       qualified_name = qualified_name_for from_mod, const_name
       path_suffix = qualified_name.underscore
 
+      # folder/named_type.rb
+      folder_named_type = const_name_parts.first + '/' + path_suffix
+
       file_path = search_for_file(path_suffix)
 
-      if file_path
-        expanded = File.expand_path(file_path)
-        expanded.sub!(/\.rb\z/, ''.freeze)
+      return load_from_path(file_path, qualified_name, from_mod, const_name) if file_path
 
-        if loading.include?(expanded)
-          raise "Circular dependency detected while autoloading constant #{qualified_name}"
-        else
-          require_or_load(expanded, qualified_name)
-          raise LoadError, "Unable to autoload constant #{qualified_name}, expected #{file_path} to define it" unless from_mod.const_defined?(const_name, false)
-          return from_mod.const_get(const_name)
-        end
-      elsif mod = autoload_module!(from_mod, const_name, qualified_name, path_suffix)
+      if mod = autoload_module!(from_mod, const_name, qualified_name, path_suffix)
         return mod
       elsif (parent = from_mod.parent) && parent != from_mod &&
             ! from_mod.parents.any? { |p| p.const_defined?(const_name, false) }
