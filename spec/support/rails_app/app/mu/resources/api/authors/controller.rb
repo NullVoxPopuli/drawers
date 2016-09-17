@@ -1,5 +1,5 @@
 module Api
-  class AuthorController < Api::BaseController
+  class AuthorsController < Api::BaseController
 
   end
 end
