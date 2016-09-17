@@ -21,14 +21,6 @@ module RailsModuleUnification
       super
     rescue LoadError, NameError
       suffixes = /(Controller|Serializer)\z/
-      # examples
-      # - ["Posts", "Controller"]
-      const_name_parts = const_name.to_s.split(suffixes)
-
-      # folder/type.rb
-      folder_type_name = const_name_parts.join('/').downcase
-
-      # TODO write code to import this kind of naming scheme
 
       # examples
       # - Api::PostsController
@@ -40,15 +32,23 @@ module RailsModuleUnification
       # - posts_controller
       file_name = qualified_name.underscore.split('/').last
 
+      # examples
+      # - controller
+      # - serializer
+      type_name = file_name.split('_').last
+
       # folder/named_type.rb
       # examples:
       # - api/posts
       # - posts
-      folder_name = qualified_name.split(suffixes).first.underscore
+      folder_name = qualified_name.split(suffixes).first.underscore.pluralize
 
       # examples:
       # - posts/posts_controller
       folder_named_type = folder_name + '/' + file_name
+
+      # folder/type.rb
+      folder_type_name = folder_name + '/' + type_name
 
 
       # without a folder / namespace?
