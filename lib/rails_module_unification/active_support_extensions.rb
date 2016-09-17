@@ -7,7 +7,6 @@ module RailsModuleUnification
       if loading.include?(expanded)
         raise "Circular dependency detected while autoloading constant #{qualified_name}"
       else
-        binding.pry
         require_or_load(expanded, qualified_name)
         raise LoadError, "Unable to autoload constant #{qualified_name}, expected #{file_path} to define it" unless from_mod.const_defined?(const_name, false)
         return from_mod.const_get(const_name)
@@ -20,28 +19,50 @@ module RailsModuleUnification
     def load_missing_constant(from_mod, const_name)
       # always default to the actual implementation
       super
-    rescue LoadError
+    rescue LoadError, NameError
       suffixes = /(Controller|Serializer)\z/
+      # examples
+      # - ["Posts", "Controller"]
       const_name_parts = const_name.to_s.split(suffixes)
 
       # folder/type.rb
       folder_type_name = const_name_parts.join('/').downcase
 
       # TODO write code to import this kind of naming scheme
-      
-      # from_mod.const_get(folder_type_name)
 
+      # examples
+      # - Api::PostsController
+      # - PostsController
       qualified_name = qualified_name_for from_mod, const_name
-      path_suffix = qualified_name.underscore
+
+      # examples
+      # - api/posts_controller
+      # - posts_controller
+      file_name = qualified_name.underscore.split('/').last
 
       # folder/named_type.rb
-      folder_named_type = const_name_parts.first + '/' + path_suffix
+      # examples:
+      # - api/posts
+      # - posts
+      folder_name = qualified_name.split(suffixes).first.underscore
 
-      file_path = search_for_file(path_suffix)
+      # examples:
+      # - posts/posts_controller
+      folder_named_type = folder_name + '/' + file_name
+
+
+      # without a folder / namespace?
+      # TODO: could this have undesired consequences?
+      file_path = search_for_file(file_name)
+      # the resource_name/controller.rb naming scheme
+      file_path ||= search_for_file(folder_type_name)
+      # the resource_name/resource_names_controller.rb naming scheme
+      file_path ||= search_for_file(folder_named_type)
 
       return load_from_path(file_path, qualified_name, from_mod, const_name) if file_path
 
-      if mod = autoload_module!(from_mod, const_name, qualified_name, path_suffix)
+
+      if mod = autoload_module!(from_mod, const_name, qualified_name, file_name)
         return mod
       elsif (parent = from_mod.parent) && parent != from_mod &&
             ! from_mod.parents.any? { |p| p.const_defined?(const_name, false) }
