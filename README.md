@@ -31,3 +31,25 @@ app/
         └── serializer.rb
 
 ```
+
+## Usage
+
+```ruby
+gem 'rails_module_unification'
+```
+
+Including the gem in your gemfile enables the new structure.
+
+## Configuration
+
+```ruby
+RailsModuleUnification.directory = 'pods'
+```
+
+Sets the folder for the new structure to be in the `app/pods` directory so that you can gradually migrate to the new structure over time.
+
+## Contributing
+
+Feel free to open an issue, or fork and make a pull request.
+
+All discussion is welcome :-)
