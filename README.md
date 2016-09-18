@@ -1,6 +1,12 @@
 # rails_module_unification
 Ember's module unification brought to Rails.
 
+[![Build Status](https://travis-ci.org/NullVoxPopuli/rails_module_unification.svg?branch=master)](https://travis-ci.org/NullVoxPopuli/rails_module_unification)
+[![Code Climate](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/badges/73a0a0761e417c655b68/gpa.svg)](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/feed)
+[![Test Coverage](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/badges/73a0a0761e417c655b68/coverage.svg)](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/coverage)
+[![Dependency Status](https://gemnasium.com/badges/github.com/NullVoxPopuli/rails_module_unification.svg)](https://gemnasium.com/github.com/NullVoxPopuli/rails_module_unification)
+
+
 ## What is this about?
 
 With large rails application, the default architecture can result in a resource's related files being very spread out through the overall project structure. For example, lets say you have 50 controllers, serializers, policies, and operations. That's _four_ different top level folders that spread out all the related objects. It makes sense do it this way, as it makes rails' autoloading programmatically easy.
