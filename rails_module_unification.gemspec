@@ -30,7 +30,6 @@ Gem::Specification.new do |s|
   # Quality Control
   s.add_development_dependency 'rubocop'
   s.add_development_dependency 'rspec'
-  s.add_development_dependency 'codeclimate-test-reporter'
 
   # Debugging
   s.add_development_dependency 'awesome_print'
