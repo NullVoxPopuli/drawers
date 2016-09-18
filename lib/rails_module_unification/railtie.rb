@@ -5,7 +5,7 @@ module RailsModuleUnification
   class Railtie < Rails::Railtie
     initializer 'activeservice.autoload', before: :set_autoload_paths do |app|
       # TODO: make the module unification root directory configurable
-      mu_dir = "#{Rails.root}/app/mu"
+      mu_dir = "#{Rails.root}/app/#{RailsModuleUnification.directory}"
 
       # Data
       data_paths = Dir["#{mu_dir}/data/**/"]
