@@ -4,6 +4,9 @@ rvm:
   - "2.3.0"
   - ruby-head
 script: "bundle exec rspec"
+addons:
+  code_climate:
+    repo_token: d1d3df95e4c3d80f789dd38e0af3efa1eb7f18485d18fee6fdd754e3e08f858b
 branches:
   only: master
 notifications:
