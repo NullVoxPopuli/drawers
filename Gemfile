@@ -7,4 +7,4 @@ gemspec
 local_gemfile = File.join(File.expand_path('..', __FILE__), 'spec/support/rails_app/Gemfile')
 eval_gemfile local_gemfile if File.readable?(local_gemfile)
 
-gem 'codeclimate-test-reporter', gorup: :test, require: nil
+gem 'codeclimate-test-reporter', group: :test, require: nil
