@@ -60,6 +60,46 @@ module RailsModuleUnification
       file_path ||= search_for_file(folder_named_type)
 
       return load_from_path(file_path, qualified_name, from_mod, const_name) if file_path
+
+      # TODO: what is the situation in which this is needed?
+      mod = autoload_module!(from_mod, const_name, qualified_name, file_name)
+      return mod if mod
+
+      if (parent = from_mod.parent) && parent != from_mod &&
+          !from_mod.parents.any? { |p| p.const_defined?(const_name, false) }
+        # If our parents do not have a constant named +const_name+ then we are free
+        # to attempt to load upwards. If they do have such a constant, then this
+        # const_missing must be due to from_mod::const_name, which should not
+        # return constants from from_mod's parents.
+        begin
+          # Since Ruby does not pass the nesting at the point the unknown
+          # constant triggered the callback we cannot fully emulate constant
+          # name lookup and need to make a trade-off: we are going to assume
+          # that the nesting in the body of Foo::Bar is [Foo::Bar, Foo] even
+          # though it might not be. Counterexamples are
+          #
+          #   class Foo::Bar
+          #     Module.nesting # => [Foo::Bar]
+          #   end
+          #
+          # or
+          #
+          #   module M::N
+          #     module S::T
+          #       Module.nesting # => [S::T, M::N]
+          #     end
+          #   end
+          #
+          # for example.
+          return parent.const_missing(const_name)
+        rescue NameError => e
+          raise unless e.missing_name? qualified_name_for(parent, const_name)
+        end
+      end
+
+      name_error = NameError.new("uninitialized constant #{qualified_name}", const_name)
+      name_error.set_backtrace(caller.reject { |l| l.starts_with? __FILE__ })
+      raise name_error
     end
   end
 end
