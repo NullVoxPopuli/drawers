@@ -3,6 +3,7 @@
 Gemfile.lock
 capybara-*.html
 .rspec
+spec/support/rails_app/log
 /log
 /tmp
 /db/*.sqlite3

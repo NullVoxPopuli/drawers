@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module RailsModuleUnification
   module ActiveSupportExtensions
+    RESOURCE_SUFFIXES = /(Controller|Serializer|Operation|Policy)/
+
     def load_from_path(file_path, qualified_name, from_mod, const_name)
       expanded = File.expand_path(file_path)
       expanded.sub!(/\.rb\z/, '')
@@ -50,20 +52,7 @@ module RailsModuleUnification
       raise unless e.missing_name? qualified_name_for(parent, const_name)
     end
 
-    # Load the constant named +const_name+ which is missing from +from_mod+. If
-    # it is not possible to load the constant into from_mod, try its parent
-    # module using +const_missing+.
-    def load_missing_constant(from_mod, const_name)
-      # always default to the actual implementation
-      super
-    rescue LoadError, NameError
-      suffixes = /(Controller|Serializer)\z/
-
-      # examples
-      # - Api::PostsController
-      # - PostsController
-      qualified_name = qualified_name_for from_mod, const_name
-
+    def resource_path_from_qualified_name(qualified_name)
       # examples
       # - api/posts_controller
       # - posts_controller
@@ -78,7 +67,7 @@ module RailsModuleUnification
       # examples:
       # - api/posts
       # - posts
-      folder_name = qualified_name.split(suffixes).first.underscore.pluralize
+      folder_name = qualified_name.split(RESOURCE_SUFFIXES).first.underscore.pluralize
 
       # examples:
       # - posts/posts_controller
@@ -94,6 +83,24 @@ module RailsModuleUnification
       file_path ||= search_for_file(folder_type_name)
       # the resource_name/resource_names_controller.rb naming scheme
       file_path ||= search_for_file(folder_named_type)
+
+      file_path
+    end
+
+    # Load the constant named +const_name+ which is missing from +from_mod+. If
+    # it is not possible to load the constant into from_mod, try its parent
+    # module using +const_missing+.
+    def load_missing_constant(from_mod, const_name)
+      # always default to the actual implementation
+      super
+    rescue LoadError, NameError
+
+      # examples
+      # - Api::PostsController
+      # - PostsController
+      qualified_name = qualified_name_for from_mod, const_name
+
+      file_path = resource_path_from_qualified_name(qualified_name)
 
       return load_from_path(file_path, qualified_name, from_mod, const_name) if file_path
 
