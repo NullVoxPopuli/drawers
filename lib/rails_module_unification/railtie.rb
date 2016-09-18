@@ -9,12 +9,10 @@ module RailsModuleUnification
 
       # Data
       data_paths = Dir["#{mu_dir}/data/**/"]
-      ap data_paths
       app.config.autoload_paths += data_paths
 
       # Resources
       resource_paths = Dir["#{mu_dir}/resources/"]
-      ap resource_paths
       app.config.autoload_paths += resource_paths
     end
   end
