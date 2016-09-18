@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require 'spec_helper'
+
 require 'rails/all'
 
 require 'factory_girl'
@@ -13,4 +15,3 @@ require 'support/rails_app/db/create'
 
 require 'support/rails_app/factory_girl'
 # require 'support/rails_app/factories'
-require 'spec_helper'
