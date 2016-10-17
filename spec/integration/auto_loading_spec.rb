@@ -41,6 +41,8 @@ describe 'Auto Loading' do
   end
 
   context 'with files that are deeply namespaced' do
-
+    it 'loads the controller' do
+      expect(Api::V2::CategoriesController).to be_truthy
+    end
   end
 end
