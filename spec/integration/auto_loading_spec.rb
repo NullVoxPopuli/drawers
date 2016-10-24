@@ -45,4 +45,10 @@ describe 'Auto Loading' do
       expect(Api::V2::CategoriesController).to be_truthy
     end
   end
+
+  context 'handles finding top level constants' do
+    it 'loads the relationship' do
+      expect { Author.create.posts }.to_not raise_error
+    end
+  end
 end

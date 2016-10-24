@@ -53,10 +53,20 @@ module RailsModuleUnification
     end
 
     def resource_path_from_qualified_name(qualified_name)
+      qualified_name_parts = qualified_name.underscore.split('/')
+
       # examples
       # - api/posts_controller
       # - posts_controller
-      file_name = qualified_name.underscore.split('/').last
+      file_name = qualified_name_parts.last
+
+      # examples
+      # - levels_operations/read
+      #   ```ruby
+      #   module LevelOperations
+      #     class Read < SkinnyControllers::Operation::Base
+      #   ```
+      parent_name = qualified_name_parts.first
 
       # examples
       # - controller
@@ -79,8 +89,14 @@ module RailsModuleUnification
       # without a folder / namespace?
       # TODO: could this have undesired consequences?
       file_path = search_for_file(file_name)
+
+      # class is defined IN the parent
+      # e.g.: LevelOperations::Read in level_operations.rb
+      file_path ||= search_for_file(parent_name)
+
       # the resource_name/controller.rb naming scheme
       file_path ||= search_for_file(folder_type_name)
+
       # the resource_name/resource_names_controller.rb naming scheme
       file_path ||= search_for_file(folder_named_type)
 
@@ -92,21 +108,31 @@ module RailsModuleUnification
     # module using +const_missing+.
     def load_missing_constant(from_mod, const_name)
       # always default to the actual implementation
-      super
-    rescue LoadError, NameError
+      result = super
+      return result if result
+    rescue LoadError, NameError => e
 
       # examples
       # - Api::PostsController
       # - PostsController
       qualified_name = qualified_name_for from_mod, const_name
-
       file_path = resource_path_from_qualified_name(qualified_name)
 
-      return load_from_path(file_path, qualified_name, from_mod, const_name) if file_path
+      begin
+        return load_from_path(file_path, qualified_name, from_mod, const_name) if file_path
+      rescue LoadError, NameError => e
+        # Recurse!
+        # not found, check the parent
+        load_missing_constant(from_mod.parent, const_name)
+      end
 
-      # TODO: what is the situation in which this is needed?
-      mod = autoload_module!(from_mod, const_name, qualified_name, file_name)
-      return mod if mod
+      # TODO: describe the situation in which this is needed
+      if file_path
+        matches = /^.+\/([^\/]+)$/.match(file_path)
+        file_name = matches[1]
+        mod = autoload_module!(from_mod, const_name, qualified_name, file_name)
+        return mod if mod
+      end
 
       from_parent = load_from_parent(from_mod, const_name)
       return from_parent if from_parent
