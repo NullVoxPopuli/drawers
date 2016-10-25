@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module RailsModuleUnification
   module ActiveSupportExtensions
-    RESOURCE_SUFFIXES = /(Controller|Serializer|Operation|Policy)/
+    RESOURCE_SUFFIXES = /(Controller|Serializer|Operations?|Policy)/
 
     def load_from_path(file_path, qualified_name, from_mod, const_name)
       expanded = File.expand_path(file_path)
@@ -11,7 +11,10 @@ module RailsModuleUnification
         raise "Circular dependency detected while autoloading constant #{qualified_name}"
       else
         require_or_load(expanded, qualified_name)
-        raise LoadError, "Unable to autoload constant #{qualified_name}, expected #{file_path} to define it" unless from_mod.const_defined?(const_name, false)
+        unless from_mod.const_defined?(const_name, false)
+          raise LoadError, "Unable to autoload constant #{qualified_name}, expected #{file_path} to define it"
+        end
+
         return from_mod.const_get(const_name)
       end
     end
@@ -53,7 +56,8 @@ module RailsModuleUnification
     end
 
     def resource_path_from_qualified_name(qualified_name)
-      qualified_name_parts = qualified_name.underscore.split('/')
+      underscored_name = qualified_name.underscore
+      qualified_name_parts = underscored_name.split('/')
 
       # examples
       # - api/posts_controller
@@ -61,12 +65,25 @@ module RailsModuleUnification
       file_name = qualified_name_parts.last
 
       # examples
-      # - levels_operations/read
+      # - levels_operations/read in level_operations.rb
       #   ```ruby
       #   module LevelOperations
       #     class Read < SkinnyControllers::Operation::Base
       #   ```
-      parent_name = qualified_name_parts.first
+      #
+      # - api/post_operations/create.rb
+      #
+      #
+      # Note that -2 is the index just before the last (the filename)
+      # this will be empty if there is only one element is qualified_name_parts
+      #
+      parent_name = qualified_name_parts[0..-2].join('/')
+
+      # examples
+      # - level_operations/read in level_operations/read.rb
+      #   namespace doesn't exist in a file of its own.
+      #   Have to check directories and see if any of the files in
+      #   those directories define the namespace
 
       # examples
       # - controller
@@ -77,14 +94,34 @@ module RailsModuleUnification
       # examples:
       # - api/posts
       # - posts
-      folder_name = qualified_name.split(RESOURCE_SUFFIXES).first.underscore.pluralize
+      resource_parts = qualified_name.split(RESOURCE_SUFFIXES)
+      folder_name = resource_parts.first.underscore.pluralize
+
+      resource_name = resource_parts.first.demodulize
+      resource_folder_name = resource_name.underscore.pluralize
+
+      # sub type folder / name
+      # examples:
+      # - api/posts/operations/
+      #   => operations
+      # - api/posts/policies/
+      #   => policies
+      sub_folder_type = resource_parts[1].downcase if resource_parts[1] =~ RESOURCE_SUFFIXES
 
       # examples:
       # - posts/posts_controller
       folder_named_type = folder_name + '/' + file_name
 
       # folder/type.rb
+      # e.g.: posts/controller.rb
       folder_type_name = folder_name + '/' + type_name
+
+      # folder/sub_folder_type/type.rb
+      # e.g.: posts/operations/create.rb
+      sub_folder_type_name = "#{folder_name}/#{sub_folder_type}/#{type_name}"
+
+      # folder/named_sub_folder_type/type
+      sub_folder_named_type = "#{folder_name}/#{resource_folder_name.singularize}_#{sub_folder_type}/#{type_name}"
 
       # without a folder / namespace?
       # TODO: could this have undesired consequences?
@@ -100,6 +137,12 @@ module RailsModuleUnification
       # the resource_name/resource_names_controller.rb naming scheme
       file_path ||= search_for_file(folder_named_type)
 
+      # the resource_name/operations/action.rb naming scheme
+      file_path ||= search_for_file(sub_folder_type_name)
+
+      # the resource_name/resource_name_operations/action.rb naming scheme
+      file_path ||= search_for_file(sub_folder_named_type)
+
       file_path
     end
 
@@ -108,9 +151,15 @@ module RailsModuleUnification
     # module using +const_missing+.
     def load_missing_constant(from_mod, const_name)
       # always default to the actual implementation
-      result = super
-      return result if result
-    rescue LoadError, NameError => e
+      super
+    rescue LoadError, NameError
+      load_missing_constant_error(from_mod, const_name)
+    end
+
+    # the heavy liftign of Rails Module Unification is just
+    # adding some additional pathfinding / constat lookup logic
+    # when the default (super) can't find what needs to be found
+    def load_missing_constant_error(from_mod, const_name)
 
       # examples
       # - Api::PostsController
@@ -120,7 +169,7 @@ module RailsModuleUnification
 
       begin
         return load_from_path(file_path, qualified_name, from_mod, const_name) if file_path
-      rescue LoadError, NameError => e
+      rescue LoadError, NameError
         # Recurse!
         # not found, check the parent
         load_missing_constant(from_mod.parent, const_name)
