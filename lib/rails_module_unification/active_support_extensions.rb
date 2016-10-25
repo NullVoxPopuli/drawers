@@ -47,7 +47,11 @@ module RailsModuleUnification
     #   Possible Locations
     #    - api/v2/categories/controller.rb
     #    - api/v2/categories/categories_controller.rb
+    #
+    # @param [String] qualified_name fully qualified class/module name to find the file location for
     def resource_path_from_qualified_name(qualified_name)
+      # Api::PostOperations::Create
+      # => api/post_operations/create
       underscored_name = qualified_name.underscore
       qualified_name_parts = underscored_name.split('/')
 
