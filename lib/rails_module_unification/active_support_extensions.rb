@@ -19,42 +19,34 @@ module RailsModuleUnification
       end
     end
 
-    def load_from_parent(from_mod, const_name)
-      # If our parents do not have a constant named +const_name+ then we are free
-      # to attempt to load upwards. If they do have such a constant, then this
-      # const_missing must be due to from_mod::const_name, which should not
-      # return constants from from_mod's parents.
-      parent = from_mod.parent
-      present_in_ancestry = (
-        parent &&
-        parent != from_mod &&
-        !from_mod.parents.any? { |p| p.const_defined?(const_name, false) }
-      )
-
-      # Since Ruby does not pass the nesting at the point the unknown
-      # constant triggered the callback we cannot fully emulate constant
-      # name lookup and need to make a trade-off: we are going to assume
-      # that the nesting in the body of Foo::Bar is [Foo::Bar, Foo] even
-      # though it might not be. Counterexamples are
-      #
-      #   class Foo::Bar
-      #     Module.nesting # => [Foo::Bar]
-      #   end
-      #
-      # or
-      #
-      #   module M::N
-      #     module S::T
-      #       Module.nesting # => [S::T, M::N]
-      #     end
-      #   end
-      #
-      # for example.
-      return parent.const_missing(const_name) if present_in_ancestry
-    rescue NameError => e
-      raise unless e.missing_name? qualified_name_for(parent, const_name)
-    end
-
+    # A look for the possible places that various qualified names could be
+    #
+    # @note The Lookup Rules:
+    #   - all resources are plural
+    #   - file_names can either be named after the type or traditional ruby/rails nameing
+    #     i.e.: posts_controller.rb vs controller.rb
+    #   - regular namespacing still applies.
+    #     i.e: Api::V2::CategoriesController should be in
+    #          api/v2/categories/controller.rb
+    #
+    # All examples assume default resource directory ("resources")
+    # and show the order of lookup
+    # @example Api::PostsController
+    #   Possible Locations
+    #    - api/posts/controller.rb
+    #    - api/posts/posts_controller.rb
+    # @example Api::PostSerializer
+    #   Possible Locations
+    #    - api/posts/serializer.rb
+    #    - api/posts/post_serializer.rb
+    # @example Api::PostOperations::Create
+    #   Possible Locations
+    #    - api/posts/operations/create.rb
+    #    - api/posts/post_operations/create.rb
+    # @example Api::V2::CategoriesController
+    #   Possible Locations
+    #    - api/v2/categories/controller.rb
+    #    - api/v2/categories/categories_controller.rb
     def resource_path_from_qualified_name(qualified_name)
       underscored_name = qualified_name.underscore
       qualified_name_parts = underscored_name.split('/')
@@ -108,20 +100,6 @@ module RailsModuleUnification
       #   => policies
       sub_folder_type = resource_parts[1].downcase if resource_parts[1] =~ RESOURCE_SUFFIXES
 
-      # examples:
-      # - posts/posts_controller
-      folder_named_type = folder_name + '/' + file_name
-
-      # folder/type.rb
-      # e.g.: posts/controller.rb
-      folder_type_name = folder_name + '/' + type_name
-
-      # folder/sub_folder_type/type.rb
-      # e.g.: posts/operations/create.rb
-      sub_folder_type_name = "#{folder_name}/#{sub_folder_type}/#{type_name}"
-
-      # folder/named_sub_folder_type/type
-      sub_folder_named_type = "#{folder_name}/#{resource_folder_name.singularize}_#{sub_folder_type}/#{type_name}"
 
       # without a folder / namespace?
       # TODO: could this have undesired consequences?
@@ -131,17 +109,44 @@ module RailsModuleUnification
       # e.g.: LevelOperations::Read in level_operations.rb
       file_path ||= search_for_file(parent_name)
 
+      # folder/type.rb
+      # e.g.: posts/controller.rb
+      folder_type_name = "#{folder_name}/#{type_name}"
       # the resource_name/controller.rb naming scheme
       file_path ||= search_for_file(folder_type_name)
 
+      # examples:
+      # - posts/posts_controller
+      folder_named_type = "#{folder_name}/#{file_name}"
       # the resource_name/resource_names_controller.rb naming scheme
       file_path ||= search_for_file(folder_named_type)
 
-      # the resource_name/operations/action.rb naming scheme
-      file_path ||= search_for_file(sub_folder_type_name)
+      if type_name == file_name
+        # folder/sub_folder_type/type.rb
+        # e.g.: posts/operations/create.rb
+        sub_folder_type_name = "#{folder_name}/#{sub_folder_type}/#{type_name}"
 
-      # the resource_name/resource_name_operations/action.rb naming scheme
-      file_path ||= search_for_file(sub_folder_named_type)
+        # the resource_name/operations/action.rb naming scheme
+        file_path ||= search_for_file(sub_folder_type_name)
+
+        # folder/named_sub_folder_type/type
+        sub_folder_named_type = "#{folder_name}/#{resource_folder_name.singularize}_#{sub_folder_type}/#{type_name}"
+        # the resource_name/resource_name_operations/action.rb naming scheme
+        file_path ||= search_for_file(sub_folder_named_type)
+      end
+
+      if file_path.blank? && qualified_name.include?('AuthorOperations')
+        puts '-------------------------------------'
+        puts "qualified_name: \t #{qualified_name}"
+        puts "file_name:   \t #{file_name}"
+        puts "type_name:   \t #{type_name}"
+        puts "parent_name: \t #{parent_name}"
+        puts "folder_type_name: \t #{folder_type_name}"
+        puts "folder_named_type: \t #{folder_named_type}"
+        puts "sub_folder_type_name: \t #{sub_folder_type_name}"
+        puts "sub_folder_named_type: \t #{sub_folder_named_type}"
+        # binding.pry
+      end
 
       file_path
     end
@@ -164,7 +169,7 @@ module RailsModuleUnification
       # examples
       # - Api::PostsController
       # - PostsController
-      qualified_name = qualified_name_for from_mod, const_name
+      qualified_name = qualified_name_for(from_mod, const_name)
       file_path = resource_path_from_qualified_name(qualified_name)
 
       begin
@@ -174,17 +179,6 @@ module RailsModuleUnification
         # not found, check the parent
         load_missing_constant(from_mod.parent, const_name)
       end
-
-      # TODO: describe the situation in which this is needed
-      if file_path
-        matches = /^.+\/([^\/]+)$/.match(file_path)
-        file_name = matches[1]
-        mod = autoload_module!(from_mod, const_name, qualified_name, file_name)
-        return mod if mod
-      end
-
-      from_parent = load_from_parent(from_mod, const_name)
-      return from_parent if from_parent
 
       name_error = NameError.new("uninitialized constant #{qualified_name}", const_name)
       name_error.set_backtrace(caller.reject { |l| l.starts_with? __FILE__ })
