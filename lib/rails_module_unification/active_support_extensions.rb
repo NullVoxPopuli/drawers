@@ -149,6 +149,7 @@ module RailsModuleUnification
 
       file_path = ''
       path_options.each do |path_option|
+
         file_path = search_for_file(path_option)
 
         break if file_path.present?
@@ -167,14 +168,18 @@ module RailsModuleUnification
     def load_missing_constant(from_mod, const_name)
       # always default to the actual implementation
       super
-    rescue LoadError, NameError
-      load_missing_constant_error(from_mod, const_name)
+    rescue LoadError, NameError => e
+      load_missing_constant_error(from_mod, const_name, e)
     end
 
     # the heavy liftign of Rails Module Unification is just
     # adding some additional pathfinding / constat lookup logic
     # when the default (super) can't find what needs to be found
-    def load_missing_constant_error(from_mod, const_name)
+    #
+    # @param [Class] from_mod - parent module / class that const_name may be a part of
+    # @param [Symbol] const_name - potential constant to lookup under from_mod
+    # @param [Exception] e - exception from previous error
+    def load_missing_constant_error(from_mod, const_name, e)
       # examples
       # - Api::PostsController
       # - PostsController
@@ -183,13 +188,13 @@ module RailsModuleUnification
 
       begin
         return load_from_path(file_path, qualified_name, from_mod, const_name) if file_path
-      rescue LoadError, NameError
+      rescue LoadError, NameError => e
         # Recurse!
         # not found, check the parent
-        load_missing_constant(from_mod.parent, const_name)
+        load_missing_constant_error(from_mod.parent, const_name, e)
       end
 
-      name_error = NameError.new("uninitialized constant #{qualified_name}", const_name)
+      name_error = NameError.new(e.message)
       name_error.set_backtrace(caller.reject { |l| l.starts_with? __FILE__ })
       raise name_error
     end
