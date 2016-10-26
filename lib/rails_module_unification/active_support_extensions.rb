@@ -106,7 +106,6 @@ module RailsModuleUnification
 
       # Api, V2, Post, Operations, Update
       # => Operations
-      # leaving Api, V2, Post, Update
       resource_type = qualified_parts[index_of_resource_type]
 
       # Api, V2, Post, Operations, Update
@@ -117,20 +116,22 @@ module RailsModuleUnification
       original_resource_name = qualified_parts[index_of_resource_type - 1]
       resource_name = original_resource_name.pluralize
 
-      # TODO: can this be an array?
       # Posts_Controller
       # Post_Operations
       named_resource_type = "#{original_resource_name}_#{resource_type}"
 
-      # Api, V2, Update
+      # Api, V2, Post, Operations, Update
       # => Api, V2
       namespace_index = index_of_resource_type - 1
       namespace = namespace_index < 1 ? '' : qualified_parts.take(namespace_index)
 
-      # Api, V2, Update
+      # Api, V2, Post, Operations, Update
       # => Update
       class_index = index_of_resource_type + 1
       class_path = class_index < 1 ? '' : qualified_parts.drop(class_index)
+
+      # Finally,
+      # build all the possible places that this file could be
       path_options = [
 
         # api/v2/posts/operations/update
