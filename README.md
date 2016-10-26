@@ -46,6 +46,23 @@ gem 'rails_module_unification'
 
 Including the gem in your gemfile enables the new structure.
 
+## Migrating
+
+Each part of your app can be migrated gradually (either manually or automatically).
+
+In order to automatically migrate resources, just run:
+
+```bash
+rake rmu:move_resource_files Post
+```
+
+If you have your controllers in an `Api` namespace, you'll also want to wrap your serializers, policies, etc in the `Api` namespace.
+In order to do that, simply add `ensure_namespace=Api`:
+
+```bash
+rake rmu:move_resource_files Post ensure_namespace=Api
+```
+
 ## Configuration
 
 ```ruby
