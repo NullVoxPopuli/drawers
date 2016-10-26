@@ -48,7 +48,7 @@ describe 'Auto Loading' do
     context 'when incorrect / no namespacing is used' do
       it 'cannot find the module and ' do
         expect { CategoryOperations }
-          .to raise_error(NameError)
+          .to raise_error(NameError, /uninitialized constant CategoryOperations/)
       end
 
       it 'tells the user (dev) what is expected when the namespace is attempted to be used' do
