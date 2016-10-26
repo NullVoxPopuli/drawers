@@ -1,3 +1,3 @@
-# TODO: this currently doesn't work, because the railtie
-# adds to the autoload paths before this file is required
-# RailsModuleUnification.directory = 'mu'
+# Aall files that follow the Rails Module Unification pattern
+# will be found under this folder
+# RailsModuleUnification.directory = 'rmu'
