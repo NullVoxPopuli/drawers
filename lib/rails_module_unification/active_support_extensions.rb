@@ -1,7 +1,20 @@
 # frozen_string_literal: true
 module RailsModuleUnification
   module ActiveSupportExtensions
-    RESOURCE_SUFFIXES = /(Controller|Serializer|Operations?|Policy)/
+    RESOURCE_SUFFIX_NAMES = %w(
+      Controller
+      Serializer
+      Operations
+      Presenters
+      Policy
+      Policies
+    ).freeze
+
+    # Join all the suffix names together with an "OR" operator
+    RESOURCE_SUFFIXES = /(#{RESOURCE_SUFFIX_NAMES.join('|')})/
+
+    # split on any of the resource suffixes OR the ruby namespace seperator
+    QUALIFIED_NAME_SPLIT = /::|#{RESOURCE_SUFFIXES}/
 
     def load_from_path(file_path, qualified_name, from_mod, const_name)
       expanded = File.expand_path(file_path)
@@ -29,20 +42,33 @@ module RailsModuleUnification
     #     i.e: Api::V2::CategoriesController should be in
     #          api/v2/categories/controller.rb
     #
+    # @note The Pattern:
+    #  - namespace_a                        - api
+    #    - namespace_b                        - v2
+    #      - resource_name (plural)             - posts
+    #        - file_type.rb                       - controller.rb (or posts_controller.rb)
+    #                                             - operations.rb (or post_operations.rb)
+    #        - folder_type                        - operations/   (or post_operations/)
+    #          - related namespaced classes         - create.rb
+    #
     # All examples assume default resource directory ("resources")
     # and show the order of lookup
+    #
     # @example Api::PostsController
     #   Possible Locations
     #    - api/posts/controller.rb
     #    - api/posts/posts_controller.rb
+    #
     # @example Api::PostSerializer
     #   Possible Locations
     #    - api/posts/serializer.rb
     #    - api/posts/post_serializer.rb
+    #
     # @example Api::PostOperations::Create
     #   Possible Locations
     #    - api/posts/operations/create.rb
     #    - api/posts/post_operations/create.rb
+    #
     # @example Api::V2::CategoriesController
     #   Possible Locations
     #    - api/v2/categories/controller.rb
@@ -50,109 +76,88 @@ module RailsModuleUnification
     #
     # @param [String] qualified_name fully qualified class/module name to find the file location for
     def resource_path_from_qualified_name(qualified_name)
+      # 1. break apart the qualified name into pieces that can easily be
+      #    manipulated
+      #
+      # Api::Posts
+      # => Api, Posts
+      #
       # Api::PostOperations::Create
-      # => api/post_operations/create
-      underscored_name = qualified_name.underscore
-      qualified_name_parts = underscored_name.split('/')
-
-      # examples
-      # - api/posts_controller
-      # - posts_controller
-      file_name = qualified_name_parts.last
-
-      # examples
-      # - levels_operations/read in level_operations.rb
-      #   ```ruby
-      #   module LevelOperations
-      #     class Read < SkinnyControllers::Operation::Base
-      #   ```
+      # => Api, Post, Operations, Create
       #
-      # - api/post_operations/create.rb
+      # Api::PostsController
+      # => Api, Posts, Controller
       #
+      # Api::V2::PostOperations::Update
+      # => Api, V2, Post, Operations, Update
+      qualified_parts = qualified_name.split(QUALIFIED_NAME_SPLIT).reject(&:blank?)
+
+      # based on the position of of the resource type name,
+      # anything to the left will be the namespace, and anything
+      # to the right will be the file path within the namespace
+      # (may be obvious, but basically, we're 'pivoting' on RESOURCE_SUFFIX_NAMES)
       #
-      # Note that -2 is the index just before the last (the filename)
-      # this will be empty if there is only one element is qualified_name_parts
+      # Given: Api, V2, Post, Operations, Update
+      #                           ^ index_of_resource_type (3)
+      index_of_resource_type = qualified_parts.index { |x| RESOURCE_SUFFIX_NAMES.include?(x) }
+
+      # if this is not part of a resource, don't even bother
+      return unless index_of_resource_type
+
+      # Api, V2, Post, Operations, Update
+      # => Operations
+      # leaving Api, V2, Post, Update
+      resource_type = qualified_parts[index_of_resource_type]
+
+      # Api, V2, Post, Operations, Update
+      # => Posts
       #
-      parent_name = qualified_name_parts[0..-2].join('/')
+      # Posts, Controller
+      # => Posts
+      original_resource_name = qualified_parts[index_of_resource_type - 1]
+      resource_name = original_resource_name.pluralize
 
-      # examples
-      # - level_operations/read in level_operations/read.rb
-      #   namespace doesn't exist in a file of its own.
-      #   Have to check directories and see if any of the files in
-      #   those directories define the namespace
+      # TODO: can this be an array?
+      # Posts_Controller
+      # Post_Operations
+      named_resource_type = "#{original_resource_name}_#{resource_type}"
 
-      # examples
-      # - controller
-      # - serializer
-      type_name = file_name.split('_').last
+      # Api, V2, Update
+      # => Api, V2
+      namespace_index = index_of_resource_type - 1
+      namespace = namespace_index < 1 ? '' : qualified_parts.take(namespace_index)
 
-      # folder/named_type.rb
-      # examples:
-      # - api/posts
-      # - posts
-      resource_parts = qualified_name.split(RESOURCE_SUFFIXES)
-      folder_name = resource_parts.first.underscore.pluralize
+      # Api, V2, Update
+      # => Update
+      class_index = index_of_resource_type + 1
+      class_path = class_index < 1 ? '' : qualified_parts.drop(class_index)
+      path_options = [
 
-      resource_name = resource_parts.first.demodulize
-      resource_folder_name = resource_name.underscore.pluralize
+        # api/v2/posts/operations/update
+        to_path(namespace, resource_name, resource_type, class_path),
 
-      # sub type folder / name
-      # examples:
-      # - api/posts/operations/
-      #   => operations
-      # - api/posts/policies/
-      #   => policies
-      sub_folder_type = resource_parts[1].downcase if resource_parts[1] =~ RESOURCE_SUFFIXES
+        # api/v2/posts/post_operations/update
+        to_path(namespace, resource_name, named_resource_type, class_path),
 
+        # api/v2/posts/posts_controller
+        to_path(namespace, resource_name, named_resource_type),
 
-      # without a folder / namespace?
-      # TODO: could this have undesired consequences?
-      file_path = search_for_file(file_name)
+        # api/v2/posts/controller
+        to_path(namespace, resource_name, resource_type)
+      ].uniq
 
-      # class is defined IN the parent
-      # e.g.: LevelOperations::Read in level_operations.rb
-      file_path ||= search_for_file(parent_name)
+      file_path = ''
+      path_options.each do |path_option|
+        file_path = search_for_file(path_option)
 
-      # folder/type.rb
-      # e.g.: posts/controller.rb
-      folder_type_name = "#{folder_name}/#{type_name}"
-      # the resource_name/controller.rb naming scheme
-      file_path ||= search_for_file(folder_type_name)
-
-      # examples:
-      # - posts/posts_controller
-      folder_named_type = "#{folder_name}/#{file_name}"
-      # the resource_name/resource_names_controller.rb naming scheme
-      file_path ||= search_for_file(folder_named_type)
-
-      if type_name == file_name
-        # folder/sub_folder_type/type.rb
-        # e.g.: posts/operations/create.rb
-        sub_folder_type_name = "#{folder_name}/#{sub_folder_type}/#{type_name}"
-
-        # the resource_name/operations/action.rb naming scheme
-        file_path ||= search_for_file(sub_folder_type_name)
-
-        # folder/named_sub_folder_type/type
-        sub_folder_named_type = "#{folder_name}/#{resource_folder_name.singularize}_#{sub_folder_type}/#{type_name}"
-        # the resource_name/resource_name_operations/action.rb naming scheme
-        file_path ||= search_for_file(sub_folder_named_type)
-      end
-
-      if file_path.blank? && qualified_name.include?('AuthorOperations')
-        puts '-------------------------------------'
-        puts "qualified_name: \t #{qualified_name}"
-        puts "file_name:   \t #{file_name}"
-        puts "type_name:   \t #{type_name}"
-        puts "parent_name: \t #{parent_name}"
-        puts "folder_type_name: \t #{folder_type_name}"
-        puts "folder_named_type: \t #{folder_named_type}"
-        puts "sub_folder_type_name: \t #{sub_folder_type_name}"
-        puts "sub_folder_named_type: \t #{sub_folder_named_type}"
-        # binding.pry
+        break if file_path.present?
       end
 
       file_path
+    end
+
+    def to_path(*args)
+      args.flatten.reject(&:blank?).map(&:underscore).join('/')
     end
 
     # Load the constant named +const_name+ which is missing from +from_mod+. If
@@ -169,7 +174,6 @@ module RailsModuleUnification
     # adding some additional pathfinding / constat lookup logic
     # when the default (super) can't find what needs to be found
     def load_missing_constant_error(from_mod, const_name)
-
       # examples
       # - Api::PostsController
       # - PostsController
