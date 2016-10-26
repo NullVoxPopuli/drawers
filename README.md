@@ -15,7 +15,6 @@ This gem provides a way to re-structure your app so that like-objects are groupe
 
 ### The new structure
 
-
 ```
 app/
 ├── channels/
@@ -37,6 +36,8 @@ app/
         └── serializer.rb
 
 ```
+
+[Checkout the sample rails app in the tests directory.](https://github.com/NullVoxPopuli/rails_module_unification/tree/master/spec/support/rails_app/app)
 
 ## Usage
 
@@ -70,7 +71,7 @@ rake rmu:move_resource_files Post ensure_namespace=Api
 RailsModuleUnification.directory = 'pods'
 ```
 
-Sets the folder for the new structure to be in the `app/pods` directory so that you can gradually migrate to the new structure over time.
+Sets the folder for the new structure to be in the `app/pods` directory if you want the new structure separate from the main app files.
 
 ## Contributing
 
