@@ -49,6 +49,7 @@ Including the gem in your gemfile enables the new structure.
 ## Configuration
 
 ```ruby
+# (Rails.root)/config/initializers/rails_module_unification.rb
 RailsModuleUnification.directory = 'pods'
 ```
 
