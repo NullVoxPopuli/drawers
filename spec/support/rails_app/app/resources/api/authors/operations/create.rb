@@ -1,7 +1,7 @@
 module Api
   module AuthorOperations
     class Create
-      include AuthorsOperations::Helpers
+      include AuthorOperations::Helpers
     end
   end
 end
