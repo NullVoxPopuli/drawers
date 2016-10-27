@@ -1,5 +1,5 @@
 module Comments
-  class RepliesController
+  class RepliesController < ApplicationController
     def index
       respond_to do |format|
         format.html
