@@ -17,7 +17,7 @@ module RailsModuleUnification
       mu_dir = "#{Rails.root}/app/#{RailsModuleUnification.directory}"
 
       # Data
-      data_paths = Dir["#{mu_dir}/data/**/"]
+      data_paths = Dir["#{mu_dir}/models/data/**/"]
       app.config.autoload_paths += data_paths
 
       # Resources
