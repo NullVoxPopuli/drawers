@@ -9,10 +9,11 @@ module RailsModuleUnification
       load 'tasks/rails_module_unification.rake'
     end
 
-    initializer 'activeservice.autoload', before: :set_autoload_paths do |app|
-      require "#{Rails.root}/config/initializers/rails_module_unification"
+    config_path = "#{Rails.root}/config/initializers/rails_module_unification"
+    config_exists = File.exist?(config_path)
+    require config_path if config_exists
 
-      # TODO: make the module unification root directory configurable
+    initializer 'activeservice.autoload', before: :set_autoload_paths do |app|
       mu_dir = "#{Rails.root}/app/#{RailsModuleUnification.directory}"
 
       # Data
