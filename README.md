@@ -1,6 +1,7 @@
 # rails_module_unification
 Ember's module unification brought to Rails.
 
+[![Gem Version](https://badge.fury.io/rb/rails_module_unification.svg)](https://badge.fury.io/rb/rails_module_unification)
 [![Build Status](https://travis-ci.org/NullVoxPopuli/rails_module_unification.svg?branch=master)](https://travis-ci.org/NullVoxPopuli/rails_module_unification)
 [![Code Climate](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/badges/73a0a0761e417c655b68/gpa.svg)](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/feed)
 [![Test Coverage](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/badges/73a0a0761e417c655b68/coverage.svg)](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/coverage)
