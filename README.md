@@ -19,8 +19,8 @@ This gem provides a way to re-structure your app so that like-objects are groupe
 ```
 app/
 ├── channels/
-├── data/
-│   └── models/
+├── models/
+│   └── data/
 │       ├── post.rb
 │       ├── comment.rb
 ├── jobs/
