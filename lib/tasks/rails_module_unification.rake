@@ -31,6 +31,9 @@ namespace :rmu do
         next
       end
 
+      next if already_moved?(location)
+
+
       destination = destination_for(location)
       move_file(location, to: destination)
     end
@@ -91,19 +94,59 @@ namespace :rmu do
     FileUtils.move(from, to)
   end
 
-  def possible_classes(resource_name, plural: false)
-    klass_name = plural ? resource_name : resource_name.pluralize
+  # See RESOURCE_SUFFIX_NAMES for total options
+  # PostSerializer
+  SINGULAR_RESOURCE_SUFFIXES = %w(
+    Serializer
+    Operations
+    Presenters
+    Policy
+    Policies
+  )
 
-    RailsModuleUnification::ActiveSupportExtensions::RESOURCE_SUFFIX_NAMES
-      .map { |suffix| "#{klass_name}#{suffix}"}
+  # PostsController
+  PLURAL_RESOURCE_SUFFIXES = %w(
+    Controller
+  )
+
+  def possible_classes(resource_name, plural: false)
+    klass_name = plural ? resource_name.pluralize : resource_name
+    suffixes = plural ? PLURAL_RESOURCE_SUFFIXES : SINGULAR_RESOURCE_SUFFIXES
+    suffixes.map { |suffix| "#{klass_name}#{suffix}" }
   end
 
   def location_of(klass)
+    # Flat default rails structure
+    guessed_path = guess_file_path(klass)
+    return guessed_path if File.exist?(guessed_path)
+
+    # Try to find the file based on method source location
+    # - will not work if a file doesn't define any methods
+    #   ( empty sub classes )
     root = Rails.root.to_s
-    possible_paths = klass.instance_methods(false).map { |m|
+    possible_paths = klass.instance_methods(false).map do |m|
       klass.instance_method(m).source_location.first
-    }.uniq
+    end.uniq
 
     possible_paths.select { |path| path.include?(root) }.first
+  end
+
+  def already_moved?(location)
+    location.include?("#{RailsModuleUnification.directory}/resources")
+  end
+
+  def guess_file_path(klass)
+    underscored = klass.name.underscore
+    file_name = underscored + '.rb'
+    resource_type = underscored.split('_').last
+
+    guessed_path = File.join(
+      Rails.root,
+      'app',
+      resource_type.pluralize,
+      file_name
+    )
+
+    guessed_path
   end
 end

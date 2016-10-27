@@ -191,7 +191,9 @@ module RailsModuleUnification
       rescue LoadError, NameError => e
         # Recurse!
         # not found, check the parent
-        load_missing_constant_error(from_mod.parent, const_name, e)
+        at_the_top = from_mod.parent == from_mod
+        return load_missing_constant_error(from_mod.parent, const_name, e) unless at_the_top
+        raise e
       end
 
       name_error = NameError.new(e.message)
