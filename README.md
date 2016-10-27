@@ -20,9 +20,10 @@ This gem provides a way to re-structure your app so that like-objects are groupe
 app/
 ├── channels/
 ├── models/
-│   └── data/
-│       ├── post.rb
-│       ├── comment.rb
+│   ├── data/
+│   │   ├── post.rb
+│   │   └── comment.rb
+│   └── graph_data.rb
 ├── jobs/
 ├── mailers/
 │   └── notification_mailer.rb
@@ -34,7 +35,10 @@ app/
     │   └── serializer.rb
     └── comments/
         ├── controller.rb
-        └── serializer.rb
+        ├── serializer.rb
+        └── views/
+            ├── index.html.erb
+            └── create.html.erb
 
 ```
 
