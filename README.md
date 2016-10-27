@@ -54,7 +54,7 @@ Each part of your app can be migrated gradually (either manually or automaticall
 In order to automatically migrate resources, just run:
 
 ```bash
-rake rmu:move_resource_files[Post]
+rake rmu:migrate_resource[Post]
 ```
 
 This will move all unnamespaced classes that contain any of the [supported resource suffixes](https://github.com/NullVoxPopuli/rails_module_unification/blob/master/lib/rails_module_unification/active_support_extensions.rb#L4) to the `app/resources/posts` directory.

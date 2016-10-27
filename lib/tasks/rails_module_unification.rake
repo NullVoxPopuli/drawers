@@ -4,12 +4,12 @@ namespace :rmu do
   require config_path if config_exists
 
   # @example
-  #  rake rmu:move_resource_files Post
+  #  rake rmu:migrate_resource Post
   # @example
-  #  rake rmu:move_resource_files Api::Event
+  #  rake rmu:migrate_resource Api::Event
 
   desc 'Moves all files related to a resource to the RMU directory'
-  task :move_resource_files, [:klass_name] => :environment do |_t, args|
+  task :migrate_resource, [:klass_name] => :environment do |_t, args|
     klass_name = args[:klass_name]
 
     # Given klass_name,
@@ -31,12 +31,8 @@ namespace :rmu do
         next
       end
 
-      puts "#{klass.name} found at #{location}"
-
       destination = destination_for(location)
-
-      puts "\t and is moving to #{destination}"
-      move_file(location, to: destination) if destination
+      move_file(location, to: destination)
     end
   end
 
@@ -72,7 +68,7 @@ namespace :rmu do
       RailsModuleUnification.directory,
       'resources',
       namespace,
-      resource_name,
+      resource_name.pluralize,
       resource_type
     ].reject(&:blank?).join('/')
 
@@ -81,7 +77,18 @@ namespace :rmu do
 
   def move_file(from, to: nil)
     puts "Moving #{from} to #{to}"
-    `mv #{from} #{to}` unless to
+    return unless to && from
+
+    matches = /.+\/(.+\.\w+)/.match(to)
+    file = matches[1]
+    path = to.sub(file, '')
+
+    unless File.directory?(path)
+      puts 'creating directory...'
+      FileUtils.mkdir_p(path)
+    end
+
+    FileUtils.move(from, to)
   end
 
   def possible_classes(resource_name, plural: false)
