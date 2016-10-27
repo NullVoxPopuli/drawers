@@ -9,5 +9,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :comments
+  resources :comments do
+    resources :replies, controller: 'comments/replies'
+  end
 end
