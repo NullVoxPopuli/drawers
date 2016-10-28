@@ -1,3 +1,2 @@
 # frozen_string_literal: true
-module CategoryOperations
-end
+json.value 'jbuilder'

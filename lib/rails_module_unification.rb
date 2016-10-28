@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 require 'active_support'
-require 'rails_module_unification/active_support_extensions'
 
 module RailsModuleUnification
-  extend ActiveSupport::Autoload
+  require 'rails_module_unification/active_support/dependency_extensions'
+  require 'rails_module_unification/action_view/path_extensions'
+  require 'rails_module_unification/action_view/resource_resolver'
+  require 'rails_module_unification/resource_parts'
 
   module_function
 
@@ -17,5 +19,7 @@ module RailsModuleUnification
   end
 
   require 'rails_module_unification/railtie'
-  ActiveSupport::Dependencies.extend RailsModuleUnification::ActiveSupportExtensions
+  ActiveSupport::Dependencies.extend RailsModuleUnification::DependencyExtensions
+  ActionController::Base.extend RailsModuleUnification::PathExtensions
+  ActionController::API.extend RailsModuleUnification::PathExtensions
 end

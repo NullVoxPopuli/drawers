@@ -9,20 +9,30 @@ module RailsModuleUnification
       load 'tasks/rails_module_unification.rake'
     end
 
+    # for customizing where the new folder structure is
+    # by default, everything still resides in Rails.root/app
     config_path = "#{Rails.root}/config/initializers/rails_module_unification"
     config_exists = File.exist?(config_path)
     require config_path if config_exists
 
+    # add folders to autoload paths
     initializer 'activeservice.autoload', before: :set_autoload_paths do |app|
-      mu_dir = "#{Rails.root}/app/#{RailsModuleUnification.directory}"
+      mu_dir = [
+        Rails.root,
+        'app',
+        RailsModuleUnification.directory
+      ].reject(&:blank?).join('/')
 
-      # Data
-      data_paths = Dir["#{mu_dir}/models/data/**/"]
-      app.config.autoload_paths += data_paths
+      # New location for ActiveRecord Models
+      app.config.autoload_paths << "#{mu_dir}/models/data"
 
       # Resources
-      resource_paths = Dir["#{mu_dir}/resources/"]
-      app.config.autoload_paths += resource_paths
+      app.config.autoload_paths << "#{mu_dir}/resources/"
+    end
+
+    config.after_initialize do
+      # binding.pry
+      ActionController::Base.prepend_view_path RailsModuleUnification::ResourceResolver.new
     end
   end
 end

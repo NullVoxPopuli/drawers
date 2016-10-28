@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 namespace :rmu do
   config_path = "#{Rails.root}/config/initializers/rails_module_unification"
   config_exists = File.exist?(config_path)
@@ -32,7 +33,6 @@ namespace :rmu do
       end
 
       next if already_moved?(location)
-
 
       destination = destination_for(location)
       move_file(location, to: destination)
@@ -102,12 +102,12 @@ namespace :rmu do
     Presenters
     Policy
     Policies
-  )
+  ).freeze
 
   # PostsController
   PLURAL_RESOURCE_SUFFIXES = %w(
     Controller
-  )
+  ).freeze
 
   def possible_classes(resource_name, plural: false)
     klass_name = plural ? resource_name.pluralize : resource_name
