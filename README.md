@@ -42,6 +42,8 @@ app/
 
 ```
 
+Does this new structure mean you have to change the class names of all your classes? Nope. In the above example file structure, `app/resources/posts/controller.rb` _still_ defines `class PostsController < ApplicationController`
+
 [Checkout the sample rails app in the tests directory.](https://github.com/NullVoxPopuli/rails_module_unification/tree/master/spec/support/rails_app/app)
 
 ## Usage
