@@ -9,22 +9,19 @@ describe 'View Lookup' do
           get '/comments'
           body = response.body
 
-          File.open('error.html', 'w') { |file| file.write(body) }
           expect(response.status).to eq 200
           expect(body).to include('Index HTML')
           expect(body).to include('Some Partial')
         end
 
-        xit 'renders jbuilder' do
-          # blocked by:
-          # https://github.com/rails/jbuilder/issues/346
-          # should work after that is fixed
+        it 'renders jbuilder' do
           headers = {
             'ACCEPT' => 'application/json',
             'CONTENT_TYPE' => 'application/json'
           }
           get '/comments.json', {}, headers
           body = response.body
+
           expect(response.status).to eq 200
           expect(body).to include('jbuilder')
         end

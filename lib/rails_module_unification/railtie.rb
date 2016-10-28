@@ -14,17 +14,20 @@ module RailsModuleUnification
     config_path = "#{Rails.root}/config/initializers/rails_module_unification"
     config_exists = File.exist?(config_path)
     require config_path if config_exists
-    mu_dir = "#{Rails.root}/app/#{RailsModuleUnification.directory}"
 
     # add folders to autoload paths
     initializer 'activeservice.autoload', before: :set_autoload_paths do |app|
-      # Data
-      data_paths = Dir["#{mu_dir}/models/data/**/"]
-      app.config.autoload_paths += data_paths
+      mu_dir = [
+        Rails.root,
+        'app',
+        RailsModuleUnification.directory
+      ].reject(&:blank?).join('/')
+
+      # New location for ActiveRecord Models
+      app.config.autoload_paths << "#{mu_dir}/models/data"
 
       # Resources
-      resource_paths = Dir["#{mu_dir}/resources/"]
-      app.config.autoload_paths += resource_paths
+      app.config.autoload_paths << "#{mu_dir}/resources/"
     end
 
     config.after_initialize do
