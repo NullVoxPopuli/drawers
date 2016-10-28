@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module RailsModuleUnification
   class ResourceParts
     RESOURCE_SUFFIX_NAMES = RailsModuleUnification::DependencyExtensions::RESOURCE_SUFFIX_NAMES

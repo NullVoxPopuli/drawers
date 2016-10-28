@@ -18,7 +18,7 @@ module RailsModuleUnification
     #   binding.pry
     #   super(name, prefix, partial, details)
     # end
-    # 
+    #
     # def build_query(path, details)
     #
     #   query = @pattern.dup
