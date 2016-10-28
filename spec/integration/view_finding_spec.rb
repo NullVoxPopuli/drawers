@@ -8,6 +8,9 @@ describe 'View Lookup' do
         it 'renders the html' do
           get '/comments'
           body = response.body
+
+          File.open('error.html', 'w') { |file| file.write(body) }
+          expect(response.status).to eq 200
           expect(body).to include('Index HTML')
           expect(body).to include('Some Partial')
         end
@@ -22,7 +25,7 @@ describe 'View Lookup' do
           }
           get '/comments.json', {}, headers
           body = response.body
-
+          expect(response.status).to eq 200
           expect(body).to include('jbuilder')
         end
       end
@@ -35,6 +38,7 @@ describe 'View Lookup' do
         it 'renders the html' do
           get '/comments/1/replies'
           body = response.body
+          expect(response.status).to eq 200
           expect(body).to include('Some replies to comments')
         end
       end
