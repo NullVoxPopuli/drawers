@@ -9,8 +9,7 @@ module RailsModuleUnification
 
     class << self
       def from_name(name)
-        resource = new(name)
-        resource.call
+        resource = call(name)
 
         [
           resource.namespace,
@@ -19,6 +18,12 @@ module RailsModuleUnification
           resource.named_resource_type,
           resource.class_path
         ]
+      end
+
+      def call(name)
+        resource = new(name)
+        resource.call
+        resource
       end
     end
 

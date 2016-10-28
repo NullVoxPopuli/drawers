@@ -5,6 +5,7 @@ require 'active_support'
 module RailsModuleUnification
   require 'rails_module_unification/active_support/dependency_extensions'
   require 'rails_module_unification/action_view/path_extensions'
+  require 'rails_module_unification/action_view/resource_resolver'
   require 'rails_module_unification/resource_parts'
 
   module_function

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RailsModuleUnification::ActiveSupportExtensions do
+describe RailsModuleUnification::DependencyExtensions do
   describe 'load_from_parent' do
 
   end
@@ -11,6 +11,6 @@ describe RailsModuleUnification::ActiveSupportExtensions do
 
   describe 'load_missing_constant' do
 
-    
+
   end
 end

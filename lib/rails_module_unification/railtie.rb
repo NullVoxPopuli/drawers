@@ -26,5 +26,10 @@ module RailsModuleUnification
       resource_paths = Dir["#{mu_dir}/resources/"]
       app.config.autoload_paths += resource_paths
     end
+
+    config.after_initialize do
+      # binding.pry
+      ActionController::Base.prepend_view_path RailsModuleUnification::ResourceResolver.new
+    end
   end
 end

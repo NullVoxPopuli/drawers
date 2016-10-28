@@ -1,5 +1,5 @@
+# frozen_string_literal: true
 module RailsModuleUnification
-
   # prepend view paths, setting preferential lookup to the new
   # RMU folders
   #
@@ -22,11 +22,10 @@ module RailsModuleUnification
 
     def _rmu_resource_path
       [
-        'resources',
         _namespace,
         _resource_name,
         'views'
-      ].reject(&:blank?).join('/')
+      ].flatten.reject(&:blank?).map(&:underscore).join('/')
     end
 
     def _resource_name
@@ -38,7 +37,7 @@ module RailsModuleUnification
     end
 
     def _resource_parts
-      @_resource_parts ||= RailsModuleUnification::ResourceParts.new(name)
+      @_resource_parts ||= RailsModuleUnification::ResourceParts.call(name)
     end
   end
 end
