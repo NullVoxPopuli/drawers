@@ -14,6 +14,8 @@ With large rails application, the default architecture can result in a resource'
 
 This gem provides a way to re-structure your app so that like-objects are grouped together.
 
+All this gem does is add some new autoloading / path resolution logic. This gem does not provide any service/operation/policy/etc functionality.
+
 ### The new structure
 
 ```
