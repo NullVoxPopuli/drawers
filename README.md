@@ -16,6 +16,8 @@ This gem provides a way to re-structure your app so that like-objects are groupe
 
 All this gem does is add some new autoloading / path resolution logic. This gem does not provide any service/operation/policy/etc functionality.
 
+**All of this is optional, and can be slowly migrated to over time. Adding this gem does not force you to change your app.**
+
 ### The new structure
 
 ```
@@ -47,6 +49,33 @@ app/
 Does this new structure mean you have to change the class names of all your classes? Nope. In the above example file structure, `app/resources/posts/controller.rb` _still_ defines `class PostsController < ApplicationController`
 
 [Checkout the sample rails app in the tests directory.](https://github.com/NullVoxPopuli/rails_module_unification/tree/master/spec/support/rails_app/app)
+
+### The Convention
+
+Say, for example, you have _any_ class/module defined as:
+
+```ruby
+module Api                    # {namespace
+  module V3                   #  namespace}
+    module UserServices       # {resource_name}{resource_type}
+      module Authentication   # {class_path
+        class OAuth2          #  class_path/file_name}
+        end
+      end
+    end
+  end
+ end
+```
+
+As long as some part of the fully qualified class name (in this example: `Api::V3::UserServices::Authentication::OAuth2`) contains any of the [defined keywords](https://github.com/NullVoxPopuli/rails_module_unification/blob/master/lib/rails_module_unification/active_support/dependency_extensions.rb#L4), the file will be found at `app/resources/api/v3/users/services/authentication/oauth2.rb`.
+
+The pattern for this is: `app/resources/:namespace/:resource_name/:resource_type/:class_path` where:
+ - `:namespace` is the namespace/parents of the `UserService`
+ - `:resource_type` is a suffix that may be inferred by checking of the inclusion of the defined keywords (linked above)
+ - `:resource_name` is the same module/class as what the `resource_type` is derived from, sans the `resource_type`
+ - `:class_path` is the remaining namespaces and eventually the class that the target file defines.
+
+So... what if you have a set of classes that don't fit the pattern exactly? You can leave those files where they are currently, or move them to `app/resources`, if it makes sense to do so. Feel free to open an issue / PR if you feel the list of resource types needs updating.
 
 ## Usage
 
