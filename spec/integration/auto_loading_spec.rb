@@ -77,6 +77,10 @@ describe 'Auto Loading' do
     it 'loads the create operation' do
       expect(CommentOperations::Create).to be_truthy
     end
+
+    it 'loads the service' do
+      expect(CommentServices::SendToFacebook).to be_truthy
+    end
   end
 
   context 'handles finding top level constants' do

@@ -8,6 +8,7 @@ module RailsModuleUnification
       Presenters
       Policy
       Policies
+      Services
     ).freeze
 
     # Join all the suffix names together with an "OR" operator
