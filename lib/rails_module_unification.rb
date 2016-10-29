@@ -21,5 +21,8 @@ module RailsModuleUnification
   require 'rails_module_unification/railtie'
   ActiveSupport::Dependencies.extend RailsModuleUnification::DependencyExtensions
   ActionController::Base.extend RailsModuleUnification::PathExtensions
-  ActionController::API.extend RailsModuleUnification::PathExtensions
+
+  if Rails.version > '5'
+    ActionController::API.extend RailsModuleUnification::PathExtensions
+  end
 end

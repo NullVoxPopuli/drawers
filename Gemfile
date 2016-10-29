@@ -9,3 +9,11 @@ local_gemfile = File.join(File.expand_path('..', __FILE__), 'spec/support/rails_
 eval_gemfile local_gemfile if File.readable?(local_gemfile)
 
 gem 'codeclimate-test-reporter', group: :test, require: nil
+
+version = ENV['RAILS_VERSION'] || '5.0'
+
+if version == 'master'
+  gem 'rails', github: 'rails/rails'
+else
+  gem 'rails', "~> #{version}.0"
+end

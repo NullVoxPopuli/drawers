@@ -38,7 +38,6 @@ Gem::Specification.new do |s|
   # for testing a gem with a rails app (controller specs)
   # https://codingdaily.wordpress.com/2011/01/14/test-a-gem-with-the-rails-3-stack/
   s.add_development_dependency 'bundler'
-  s.add_development_dependency 'rails'
   s.add_development_dependency 'factory_girl'
   s.add_development_dependency 'factory_girl_rails'
   s.add_development_dependency 'rspec-rails'
