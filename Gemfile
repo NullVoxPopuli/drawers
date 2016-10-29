@@ -13,22 +13,7 @@ gem 'codeclimate-test-reporter', group: :test, require: nil
 version = ENV['RAILS_VERSION'] || '5.0'
 
 if version == 'master'
-  gem 'rack', github: 'rack/rack'
-  gem 'arel', github: 'rails/arel'
-  git 'https://github.com/rails/rails.git' do
-    gem 'railties'
-    gem 'activesupport'
-    gem 'activemodel'
-    gem 'actionpack'
-    gem 'activerecord', group: :test
-    # Rails 5
-    gem 'actionview'
-  end
+  gem 'rails', github: 'rails/rails'
 else
-  gem_version = "~> #{version}.0"
-  gem 'railties', gem_version
-  gem 'activesupport', gem_version
-  gem 'activemodel', gem_version
-  gem 'actionpack', gem_version
-  gem 'activerecord', gem_version, group: :test
+  gem 'rails', "~> #{version}.0"
 end
