@@ -12,8 +12,6 @@ module RailsModuleUnification
   #
   # This module should only be used as class methods on the inheriting object
   module PathExtensions
-    require 'awesome_print'
-
     def local_prefixes
       [_rmu_resource_path] + super
     end
