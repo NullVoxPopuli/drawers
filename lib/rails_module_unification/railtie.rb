@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'rails/railtie'
+require 'action_controller'
 
 module RailsModuleUnification
   class Railtie < Rails::Railtie
