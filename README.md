@@ -102,7 +102,7 @@ ActiveModelSerializers.config.serializer_lookup_chain.unshift(
   end
 )
 ```
-Note: as of 2016-11-04, only [this branch](https://github.com/rails-api/active_model_serializers/pull/1757) supports a confnigurable lookup chain
+Note: as of 2016-11-04, only [this branch of AMS](https://github.com/rails-api/active_model_serializers/pull/1757) supports a confnigurable lookup chain
 
 ## Migrating
 
