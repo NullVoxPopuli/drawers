@@ -13,6 +13,7 @@ env:
 
 install: bundle install --path=vendor/bundle --retry=3 --jobs=3
 script: "bundle exec rspec"
+after_script: codeclimate-test-reporter
 
 addons:
   code_climate:
