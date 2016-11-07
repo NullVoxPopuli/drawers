@@ -94,11 +94,8 @@ To address that problem, you'll need to add this to the serializer lookup chain
 ```ruby
 # config/initializers/active_model_serializers.rb
 ActiveModelSerializers.config.serializer_lookup_chain.unshift(
-  lambda do |resource_class, _, controller_class|
-    if controller_class
-      serializer_name = "::#{resource_class.name}Serializer"
-      controller_class.name.gsub(/::([^:])+Controller$/, serializer_name)
-    end
+  lambda do |resource_class, _, namespace|
+    "#{namespace.name}::#{resource_class.name}Serializer" if namespace
   end
 )
 ```
