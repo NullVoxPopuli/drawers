@@ -20,7 +20,7 @@ All this gem does is add some new autoloading / path resolution logic. This gem 
 
 ### The new structure
 
-```
+```ruby
 app/
 ├── channels/
 ├── models/
