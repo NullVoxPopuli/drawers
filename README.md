@@ -33,10 +33,10 @@ app/
 │   └── notification_mailer.rb
 └── resources/
     ├── posts/
-    │   ├── controller.rb
-    │   ├── operation.rb
-    │   ├── policy.rb
-    │   └── serializer.rb
+    │   ├── controller.rb  # or posts_controller.rb
+    │   ├── operations.rb  # or post_operations.rb
+    │   ├── policy.rb      # or post_policy.rb
+    │   └── serializer.rb  # or post_serializer.rb
     └── comments/
         ├── controller.rb
         ├── serializer.rb
