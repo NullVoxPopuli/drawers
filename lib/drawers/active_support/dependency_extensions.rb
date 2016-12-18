@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-module RailsModuleUnification
+module Drawers
   module DependencyExtensions
     RESOURCE_SUFFIX_NAMES = %w(
       Controller
@@ -122,7 +122,7 @@ module RailsModuleUnification
       load_missing_constant_error(from_mod, const_name, e)
     end
 
-    # the heavy liftign of Rails Module Unification is just
+    # the heavy lifting of Drawers is just
     # adding some additional pathfinding / constat lookup logic
     # when the default (super) can't find what needs to be found
     #

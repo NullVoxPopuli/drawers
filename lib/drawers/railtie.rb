@@ -2,17 +2,17 @@
 require 'rails/railtie'
 require 'action_controller'
 
-module RailsModuleUnification
+module Drawers
   class Railtie < Rails::Railtie
-    railtie_name :rails_module_unification
+    railtie_name :drawers
 
     rake_tasks do
-      load 'tasks/rails_module_unification.rake'
+      load 'tasks/drawers.rake'
     end
 
     # for customizing where the new folder structure is
     # by default, everything still resides in Rails.root/app
-    config_path = "#{Rails.root}/config/initializers/rails_module_unification"
+    config_path = "#{Rails.root}/config/initializers/drawers"
     config_exists = File.exist?(config_path)
     require config_path if config_exists
 
@@ -21,7 +21,7 @@ module RailsModuleUnification
       mu_dir = [
         Rails.root,
         'app',
-        RailsModuleUnification.directory
+        Drawers.directory
       ].reject(&:blank?).join('/')
 
       # New location for ActiveRecord Models
@@ -32,7 +32,7 @@ module RailsModuleUnification
     end
 
     config.after_initialize do
-      ActionController::Base.prepend_view_path RailsModuleUnification::ResourceResolver.new
+      ActionController::Base.prepend_view_path Drawers::ResourceResolver.new
     end
   end
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 namespace :rmu do
-  config_path = "#{Rails.root}/config/initializers/rails_module_unification"
+  config_path = "#{Rails.root}/config/initializers/drawers"
   config_exists = File.exist?(config_path)
   require config_path if config_exists
 
@@ -68,7 +68,7 @@ namespace :rmu do
     destination = [
       project_root,
       'app',
-      RailsModuleUnification.directory,
+      Drawers.directory,
       'resources',
       namespace,
       resource_name.pluralize,
@@ -132,7 +132,7 @@ namespace :rmu do
   end
 
   def already_moved?(location)
-    location.include?("#{RailsModuleUnification.directory}/resources")
+    location.include?("#{Drawers.directory}/resources")
   end
 
   def guess_file_path(klass)

@@ -1,11 +1,11 @@
-# rails_module_unification
-Ember's module unification brought to Rails.
+# drawers
+Group like-classes together. No more silos.
 
-[![Gem Version](https://badge.fury.io/rb/rails_module_unification.svg)](https://badge.fury.io/rb/rails_module_unification)
-[![Build Status](https://travis-ci.org/NullVoxPopuli/rails_module_unification.svg?branch=master)](https://travis-ci.org/NullVoxPopuli/rails_module_unification)
+[![Gem Version](https://badge.fury.io/rb/drawers.svg)](https://badge.fury.io/rb/drawers)
+[![Build Status](https://travis-ci.org/NullVoxPopuli/drawers.svg?branch=master)](https://travis-ci.org/NullVoxPopuli/drawers)
 [![Code Climate](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/badges/73a0a0761e417c655b68/gpa.svg)](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/feed)
 [![Test Coverage](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/badges/73a0a0761e417c655b68/coverage.svg)](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/coverage)
-[![Dependency Status](https://gemnasium.com/badges/github.com/NullVoxPopuli/rails_module_unification.svg)](https://gemnasium.com/github.com/NullVoxPopuli/rails_module_unification)
+[![Dependency Status](https://gemnasium.com/badges/github.com/NullVoxPopuli/drawers.svg)](https://gemnasium.com/github.com/NullVoxPopuli/drawers)
 
 
 ## What is this about?
@@ -48,7 +48,7 @@ app/
 
 Does this new structure mean you have to change the class names of all your classes? Nope. In the above example file structure, `app/resources/posts/controller.rb` _still_ defines `class PostsController < ApplicationController`
 
-[Checkout the sample rails app in the tests directory.](https://github.com/NullVoxPopuli/rails_module_unification/tree/master/spec/support/rails_app/app)
+[Checkout the sample rails app in the tests directory.](https://github.com/NullVoxPopuli/drawers/tree/master/spec/support/rails_app/app)
 
 ### The Convention
 
@@ -67,7 +67,7 @@ module Api                    # {namespace
  end
 ```
 
-As long as some part of the fully qualified class name (in this example: `Api::V3::UserServices::Authentication::OAuth2`) contains any of the [defined keywords](https://github.com/NullVoxPopuli/rails_module_unification/blob/master/lib/rails_module_unification/active_support/dependency_extensions.rb#L4), the file will be found at `app/resources/api/v3/users/services/authentication/oauth2.rb`.
+As long as some part of the fully qualified class name (in this example: `Api::V3::UserServices::Authentication::OAuth2`) contains any of the [defined keywords](https://github.com/NullVoxPopuli/drawers/blob/master/lib/drawers/active_support/dependency_extensions.rb#L4), the file will be found at `app/resources/api/v3/users/services/authentication/oauth2.rb`.
 
 The pattern for this is: `app/resources/:namespace/:resource_name/:resource_type/:class_path` where:
  - `:namespace` is the namespace/parents of the `UserService`
@@ -80,7 +80,7 @@ So... what if you have a set of classes that don't fit the pattern exactly? You 
 ## Usage
 
 ```ruby
-gem 'rails_module_unification'
+gem 'drawers'
 ```
 
 Including the gem in your gemfile enables the new structure.
@@ -111,13 +111,13 @@ In order to automatically migrate resources, just run:
 rake rmu:migrate_resource[Post]
 ```
 
-This will move all unnamespaced classes that contain any of the [supported resource suffixes](https://github.com/NullVoxPopuli/rails_module_unification/blob/master/lib/rails_module_unification/active_support_extensions.rb#L4) to the `app/resources/posts` directory.
+This will move all unnamespaced classes that contain any of the [supported resource suffixes](https://github.com/NullVoxPopuli/drawers/blob/master/lib/drawers/active_support_extensions.rb#L4) to the `app/resources/posts` directory.
 
 ## Configuration
 
 ```ruby
-# (Rails.root)/config/initializers/rails_module_unification.rb
-RailsModuleUnification.directory = 'pods'
+# (Rails.root)/config/initializers/drawers.rb
+Drawers.directory = 'pods'
 ```
 
 Sets the folder for the new structure to be in the `app/pods` directory if you want the new structure separate from the main app files.

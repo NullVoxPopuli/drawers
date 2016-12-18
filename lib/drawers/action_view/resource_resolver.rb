@@ -2,13 +2,13 @@
 
 require 'action_view'
 
-module RailsModuleUnification
+module Drawers
   class ResourceResolver < ::ActionView::OptimizedFileSystemResolver
     def initialize
       path = [
         Rails.root,
         'app',
-        RailsModuleUnification.directory,
+        Drawers.directory,
         'resources'
       ].reject(&:blank?).join('/')
 

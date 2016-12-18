@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-module RailsModuleUnification
+module Drawers
   class ResourceParts
-    RESOURCE_SUFFIX_NAMES = RailsModuleUnification::DependencyExtensions::RESOURCE_SUFFIX_NAMES
-    QUALIFIED_NAME_SPLIT = RailsModuleUnification::DependencyExtensions::QUALIFIED_NAME_SPLIT
+    RESOURCE_SUFFIX_NAMES = Drawers::DependencyExtensions::RESOURCE_SUFFIX_NAMES
+    QUALIFIED_NAME_SPLIT = Drawers::DependencyExtensions::QUALIFIED_NAME_SPLIT
 
     attr_reader :namespace, :resource_name,
       :resource_type, :named_resource_type,

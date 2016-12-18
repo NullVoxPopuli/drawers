@@ -5,18 +5,18 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require 'rails_module_unification/version'
+require 'drawers/version'
 
 Gem::Specification.new do |s|
-  s.name        = 'rails_module_unification'
-  s.version     = RailsModuleUnification::VERSION
+  s.name        = 'drawers'
+  s.version     = Drawers::VERSION
   s.platform    = Gem::Platform::RUBY
   s.license     = 'MIT'
   s.authors     = ['L. Preston Sego III']
   s.email       = 'LPSego3+dev@gmail.com'
-  s.homepage    = 'https://github.com/NullVoxPopuli/rails_module_unification'
-  s.summary     = "RailsModuleUnification-#{RailsModuleUnification::VERSION}"
-  s.description = 'Ember\'s Module Unification brought to Rails'
+  s.homepage    = 'https://github.com/NullVoxPopuli/drawers'
+  s.summary     = "Drawers-#{Drawers::VERSION}"
+  s.description = 'Group like-classes together. No more silos.'
 
   s.files        = Dir['CHANGELOG.md', 'LICENSE', 'README.md', 'lib/**/*']
   s.require_path = 'lib'

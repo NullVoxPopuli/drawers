@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-module RailsModuleUnification
+module Drawers
   # prepend view paths, setting preferential lookup to the new
   # RMU folders
   #
@@ -35,7 +35,7 @@ module RailsModuleUnification
     end
 
     def _resource_parts
-      @_resource_parts ||= RailsModuleUnification::ResourceParts.call(name)
+      @_resource_parts ||= Drawers::ResourceParts.call(name)
     end
   end
 end
