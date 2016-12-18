@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.email       = 'LPSego3+dev@gmail.com'
   s.homepage    = 'https://github.com/NullVoxPopuli/drawers'
   s.summary     = "Drawers-#{Drawers::VERSION}"
-  s.description = 'Group like-classes together. No more silos.'
+  s.description = 'Group related classes together. No more silos.'
 
   s.files        = Dir['CHANGELOG.md', 'LICENSE', 'README.md', 'lib/**/*']
   s.require_path = 'lib'
