@@ -127,3 +127,11 @@ Sets the folder for the new structure to be in the `app/pods` directory if you w
 Feel free to open an issue, or fork and make a pull request.
 
 All discussion is welcome :-)
+
+
+---------------
+
+The gem name 'Drawers' was provided by @bartboy011.
+Thanks @bartboy011!
+
+The previous name of this gem was Rails Module Unification -- which, while a homage to its inspiration, Ember's Module Unification app architecture, it's quite a mouthful, and doesn't exactly make for a good gem name.
