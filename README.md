@@ -1,4 +1,4 @@
-# drawers
+# Drawers
 Group related classes together. No more silos.
 
 [![Gem Version](https://badge.fury.io/rb/drawers.svg)](https://badge.fury.io/rb/drawers)
