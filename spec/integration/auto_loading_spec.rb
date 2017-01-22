@@ -21,7 +21,9 @@ describe 'Auto Loading' do
       end
 
       it 'loads the form' do
-        expect(Api::PostForms::NewUserForm.new).to be_truthy
+        expect(Api::PostForms::NewUser.new).to be_truthy
+        expect(Api::PostForms::Update.new).to be_truthy
+        expect(Api::PostForms::CreateForm.new).to be_truthy
       end
     end
 

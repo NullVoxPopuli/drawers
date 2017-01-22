@@ -33,6 +33,8 @@ app/
 │   └── notification_mailer.rb
 └── resources/
     ├── posts/
+    │   ├── forms/
+    │   │   └── new_post_form.rb
     │   ├── controller.rb  # or posts_controller.rb
     │   ├── operations.rb  # or post_operations.rb
     │   ├── policy.rb      # or post_policy.rb

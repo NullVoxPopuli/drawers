@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module Api
   module PostForms
-    class NewUserForm
+    class NewUser
     end
   end
 end

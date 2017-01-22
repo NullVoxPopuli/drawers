@@ -3,7 +3,7 @@ module Drawers
   module DependencyExtensions
     RESOURCE_SUFFIX_NAMES = %w(
       Controller
-      Form
+      Forms
       Serializer
       Operations
       Presenters
@@ -78,14 +78,33 @@ module Drawers
     #
     # @param [String] qualified_name fully qualified class/module name to find the file location for
     def resource_path_from_qualified_name(qualified_name)
+      path_options = path_options_for_qualified_name(qualified_name)
+
+      file_path = ''
+      path_options.uniq.each do |path_option|
+        file_path = search_for_file(path_option)
+
+        break if file_path.present?
+      end
+
+      return file_path if file_path
+
+      # Note that sometimes, the resource_type path may only be defined in a
+      # resource type folder
+      # So, look for the first file within the resource type folder
+      # because of ruby namespacing conventions if there is a file in the folder,
+      # it MUST define the namespace
+      path_for_first_file_in(path_options.last) || path_for_first_file_in(path_options[-2])
+    end
+
+    def path_options_for_qualified_name(qualified_name)
       namespace,
       resource_name,
       resource_type, named_resource_type,
       class_path = ResourceParts.from_name(qualified_name)
 
       # build all the possible places that this file could be
-      path_options = [
-
+      [
         # api/v2/posts/operations/update
         to_path(namespace, resource_name, resource_type, class_path),
 
@@ -97,23 +116,7 @@ module Drawers
 
         # api/v2/posts/controller
         to_path(namespace, resource_name, resource_type)
-      ].uniq
-
-      file_path = ''
-      path_options.each do |path_option|
-        file_path = search_for_file(path_option)
-
-        break if file_path.present?
-      end
-
-      # Note that sometimes, the resource_type path may only be defined in a
-      # resource type folder
-      # So, look for the first file within the resource type folder
-      # because of ruby namespacing conventions if there is a file in the folder,
-      # it MUST define the namespace
-      file_path = path_for_first_file_in(path_options.last) unless file_path
-
-      file_path
+      ]
     end
 
     def path_for_first_file_in(path)
