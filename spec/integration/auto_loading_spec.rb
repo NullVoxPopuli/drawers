@@ -19,6 +19,10 @@ describe 'Auto Loading' do
       it 'loads the operation namespaced class' do
         expect(Api::PostOperations::Create.new).to be_truthy
       end
+
+      it 'loads the form' do
+        expect(Api::PostForms::NewUserForm.new).to be_truthy
+      end
     end
 
     context 'with files named after type (and folder named after the resource)' do
@@ -60,7 +64,7 @@ describe 'Auto Loading' do
 
       it 'cannot find the class when the module cannot be found' do
         expect { CategoryOperations::Create }
-          .to raise_error(NameError, /uninitialized constant CategoryOperations::Create/)
+          .to raise_error(NameError, /uninitialized constant CategoryOperations/)
       end
     end
   end

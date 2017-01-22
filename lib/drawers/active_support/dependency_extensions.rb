@@ -3,6 +3,7 @@ module Drawers
   module DependencyExtensions
     RESOURCE_SUFFIX_NAMES = %w(
       Controller
+      Form
       Serializer
       Operations
       Presenters
@@ -10,6 +11,8 @@ module Drawers
       Policies
       Services
     ).freeze
+
+    ERROR_CIRCULAR_DEPENDENCY = 'Circular dependency detected while autoloading constant'
 
     # Join all the suffix names together with an "OR" operator
     RESOURCE_SUFFIXES = /(#{RESOURCE_SUFFIX_NAMES.join('|')})/
@@ -21,16 +24,14 @@ module Drawers
       expanded = File.expand_path(file_path)
       expanded.sub!(/\.rb\z/, '')
 
-      if loading.include?(expanded)
-        raise "Circular dependency detected while autoloading constant #{qualified_name}"
-      else
-        require_or_load(expanded, qualified_name)
-        unless from_mod.const_defined?(const_name, false)
-          raise LoadError, "Unable to autoload constant #{qualified_name}, expected #{file_path} to define it"
-        end
+      raise "#{ERROR_CIRCULAR_DEPENDENCY} #{qualified_name}" if loading.include?(expanded)
 
-        return from_mod.const_get(const_name)
+      require_or_load(expanded, qualified_name)
+      unless from_mod.const_defined?(const_name, false)
+        raise LoadError, "Unable to autoload constant #{qualified_name}, expected #{file_path} to define it"
       end
+
+      from_mod.const_get(const_name)
     end
 
     # A look for the possible places that various qualified names could be
@@ -105,7 +106,23 @@ module Drawers
         break if file_path.present?
       end
 
+      # Note that sometimes, the resource_type path may only be defined in a
+      # resource type folder
+      # So, look for the first file within the resource type folder
+      # because of ruby namespacing conventions if there is a file in the folder,
+      # it MUST define the namespace
+      file_path = path_for_first_file_in(path_options.last) unless file_path
+
       file_path
+    end
+
+    def path_for_first_file_in(path)
+      return if path.blank?
+
+      path_in_app = "#{Rails.root}/app/resources/#{path.pluralize}"
+      return unless File.directory?(path_in_app)
+
+      Dir.glob("#{path_in_app}/*.rb").first
     end
 
     def to_path(*args)
