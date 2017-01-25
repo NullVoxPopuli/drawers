@@ -11,7 +11,9 @@ env:
     - "RAILS_VERSION=5.0"
     - "RAILS_VERSION=master"
 
-install: bundle update --path=vendor/bundle --retry=3 --jobs=3
+install:
+  - bundle install --path=vendor/bundle --retry=3 --jobs=3
+  - bundle update --path=vendor/bundle --retry=3 --jobs=3
 script: "bundle exec rspec"
 after_script: codeclimate-test-reporter
 
