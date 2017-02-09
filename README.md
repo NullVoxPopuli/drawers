@@ -3,8 +3,8 @@ Group related classes together. No more silos.
 
 [![Gem Version](https://badge.fury.io/rb/drawers.svg)](https://badge.fury.io/rb/drawers)
 [![Build Status](https://travis-ci.org/NullVoxPopuli/drawers.svg?branch=master)](https://travis-ci.org/NullVoxPopuli/drawers)
-[![Code Climate](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/badges/73a0a0761e417c655b68/gpa.svg)](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/feed)
-[![Test Coverage](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/badges/73a0a0761e417c655b68/coverage.svg)](https://codeclimate.com/repos/57dddb2c50dac40e6900197c/coverage)
+[![Code Climate](https://codeclimate.com/github/NullVoxPopuli/drawers/badges/gpa.svg)](https://codeclimate.com/github/NullVoxPopuli/drawers)
+[![Test Coverage](https://codeclimate.com/github/NullVoxPopuli/drawers/badges/coverage.svg)](https://codeclimate.com/github/NullVoxPopuli/drawers/coverage)
 [![Dependency Status](https://gemnasium.com/badges/github.com/NullVoxPopuli/drawers.svg)](https://gemnasium.com/github.com/NullVoxPopuli/drawers)
 
 
