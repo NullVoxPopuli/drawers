@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 module Drawers
   class ResourceParts
-    RESOURCE_SUFFIX_NAMES = Drawers::DependencyExtensions::RESOURCE_SUFFIX_NAMES
-    QUALIFIED_NAME_SPLIT = Drawers::DependencyExtensions::QUALIFIED_NAME_SPLIT
-
     attr_reader :namespace, :resource_name,
       :resource_type, :named_resource_type,
       :class_path
@@ -80,7 +77,9 @@ module Drawers
     # Api::V2::PostOperations::Update
     # => Api, V2, Post, Operations, Update
     def qualified_parts
-      @qualified_parts ||= @qualified_name.split(QUALIFIED_NAME_SPLIT).reject(&:blank?)
+      @qualified_parts ||= @qualified_name
+                           .split(Drawers.qualified_name_split)
+                           .reject(&:blank?)
     end
 
     # based on the position of of the resource type name,
@@ -91,7 +90,7 @@ module Drawers
     # Given: Api, V2, Post, Operations, Update
     #                           ^ index_of_resource_type (3)
     def index_of_resource_type
-      @index_of_resource_type ||= qualified_parts.index { |x| RESOURCE_SUFFIX_NAMES.include?(x) }
+      @index_of_resource_type ||= qualified_parts.index { |x| Drawers.resource_suffixes.include?(x) }
     end
   end
 end

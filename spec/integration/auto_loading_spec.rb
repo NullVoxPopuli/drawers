@@ -94,4 +94,27 @@ describe 'Auto Loading' do
       expect { Author.create.posts }.to_not raise_error
     end
   end
+
+  context 'with a non-default-ily named file' do
+    context 'is configured to find non-default file' do
+      before(:each) do
+        Drawers.resource_suffixes = ['Thing']
+      end
+
+      after(:each) do
+        Drawers.resource_suffixes = Drawers::DEFAULT_RESOURCE_SUFFIXES
+        Object.send(:remove_const, :CommentThing) if defined? CommentThing
+      end
+
+      it 'finds the file' do
+        expect { CommentThing }.to_not raise_error
+      end
+    end
+
+    context 'is not configured to find non-default file' do
+      it 'errors' do
+        expect { CommentThing }.to raise_error(NameError, /uninitialized constant CommentThing/)
+      end
+    end
+  end
 end
