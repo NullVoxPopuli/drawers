@@ -1,24 +1,7 @@
 # frozen_string_literal: true
 module Drawers
   module DependencyExtensions
-    RESOURCE_SUFFIX_NAMES = %w(
-      Controller
-      Forms
-      Serializer
-      Operations
-      Presenters
-      Policy
-      Policies
-      Services
-    ).freeze
-
     ERROR_CIRCULAR_DEPENDENCY = 'Circular dependency detected while autoloading constant'
-
-    # Join all the suffix names together with an "OR" operator
-    RESOURCE_SUFFIXES = /(#{RESOURCE_SUFFIX_NAMES.join('|')})/
-
-    # split on any of the resource suffixes OR the ruby namespace seperator
-    QUALIFIED_NAME_SPLIT = /::|#{RESOURCE_SUFFIXES}/
 
     def load_from_path(file_path, qualified_name, from_mod, const_name)
       expanded = File.expand_path(file_path)
