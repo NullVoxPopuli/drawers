@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 2.0'
 
-  s.add_runtime_dependency 'activesupport'
+  s.add_runtime_dependency 'activesupport', ['> 4.1', '< 6.0']
 
   # Quality Control
   s.add_development_dependency 'rubocop'
