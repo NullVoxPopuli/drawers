@@ -126,6 +126,36 @@ Drawers.directory = 'pods'
 
 Sets the folder for the new structure to be in the `app/pods` directory if you want the new structure separate from the main app files.
 
+### Co-Location of Tests / Specs
+
+There are some mixed feelings about co-location of specs, so (by default), this monkey patch is not included.
+
+```ruby
+# config/initializers/gems/rails.rb
+module Rails
+  class Engine
+    # https://github.com/rails/rails/blob/5-1-stable/railties/lib/rails/engine.rb#L472-L479
+    # https://github.com/rails/rails/blob/4-2-stable/railties/lib/rails/engine.rb#L468
+    def eager_load!
+      config.eager_load_paths.each do |load_path|
+        matcher = /\A#{Regexp.escape(load_path.to_s)}\/(.*)\.rb\Z/
+        # They key is the !(spec) added to the glob pattern.
+        # You may need to modify this if your tests don't end with spec
+        Dir.glob("#{load_path}/**/*!(spec).rb").sort.each do |file|
+          require_dependency file.sub(matcher, '\1')
+        end
+      end
+    end
+  end
+end
+```
+
+Your test suite command would then need to change to include the `app` directory.
+```
+rspec app/ spec/
+```
+And you'll still want to use the spec folder for `spec_helper.rb`, factories, and other support things.
+
 ## Contributing
 
 Feel free to open an issue, or fork and make a pull request.
