@@ -15,12 +15,8 @@ The issue tracker is the preferred channel for [bug reports](#bugs),
 [features requests](#features) and [submitting pull
 requests](#pull-requests), but please respect the following restrictions:
 
-* Please **do not** use the issue tracker for personal support requests (use
-  [Stack Overflow](http://stackoverflow.com) or IRC).
-
 * Please **do not** derail or troll issues. Keep the discussion on topic and
   respect the opinions of others.
-
 
 <a name="bugs"></a>
 ## Bug reports
@@ -102,7 +98,7 @@ project:
    # Navigate to the newly cloned directory
    cd <repo-name>
    # Assign the original repo to a remote called "upstream"
-   git remote add upstream https://github.com/<upstream-owner>/<repo-name>
+   git remote add upstream https://github.com/NullVoxPopuli/<repo-name>
    ```
 
 2. If you cloned a while ago, get the latest changes from upstream:
