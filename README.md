@@ -89,7 +89,7 @@ Including the gem in your gemfile enables the new structure.
 
 ### A note for ActiveModelSerializers
 
-ActiveModelSerializers, be default, does not consider your _controller's_ namespace when searching for searializers.
+ActiveModelSerializers, by default, does not consider your _controller's_ namespace when searching for searializers.
 
 To address that problem, you'll need to add this to the serializer lookup chain
 
@@ -101,7 +101,7 @@ ActiveModelSerializers.config.serializer_lookup_chain.unshift(
   end
 )
 ```
-Note: as of 2016-11-04, only [this branch of AMS](https://github.com/rails-api/active_model_serializers/pull/1757) supports a confnigurable lookup chain
+Note: as of 2016-11-04, only [this branch of AMS](https://github.com/rails-api/active_model_serializers/pull/1757) supports a configurable lookup chain
 
 Note: as of 2016-11-16, the `master` (>= v0.10.3) branch of AMS supports configurable lookup chain.
 
