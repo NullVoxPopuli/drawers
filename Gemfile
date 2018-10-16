@@ -13,10 +13,10 @@ group :test do
   gem 'codeclimate-test-reporter', group: :test, require: nil
 end
 
-version = ENV['RAILS_VERSION'] || '5.0'
+version = ENV['RAILS_VERSION'] || '5.0.7'
 
 if version == 'master'
   gem 'rails', github: 'rails/rails'
 else
-  gem 'rails', "~> #{version}.0"
+  gem 'rails', "~> #{version}"
 end
