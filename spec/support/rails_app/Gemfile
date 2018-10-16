@@ -2,12 +2,12 @@
 # source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-version = ENV['RAILS_VERSION'] || '5.0'
+version = ENV['RAILS_VERSION'] || '5.0.7'
 
 if version == 'master'
   gem 'rails', github: 'rails/rails'
 else
-  gem 'rails', "~> #{version}.0"
+  gem 'rails', "~> #{version}"
 end
 
 # Use sqlite3 as the database for Active Record
